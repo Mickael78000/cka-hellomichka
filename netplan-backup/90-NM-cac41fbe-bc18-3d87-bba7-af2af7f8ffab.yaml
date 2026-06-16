@@ -1,0 +1,19 @@
+network:
+  version: 2
+  ethernets:
+    enp1s0:
+      renderer: NetworkManager
+      match: {}
+      addresses:
+      - "192.168.1.52/24"
+      nameservers:
+        addresses:
+        - 192.168.1.1
+      networkmanager:
+        uuid: "cac41fbe-bc18-3d87-bba7-af2af7f8ffab"
+        name: "netplan-enp1s0"
+        passthrough:
+          connection.timestamp: "1780441345"
+          ipv4.address1: "192.168.1.52/24,192.168.1.1"
+          ipv4.method: "manual"
+          proxy._: ""

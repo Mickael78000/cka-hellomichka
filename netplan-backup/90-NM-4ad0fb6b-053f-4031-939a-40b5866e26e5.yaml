@@ -1,0 +1,24 @@
+network:
+  version: 2
+  wifis:
+    NM-4ad0fb6b-053f-4031-939a-40b5866e26e5:
+      renderer: NetworkManager
+      match:
+        name: "wlp2s0"
+      dhcp4: true
+      dhcp6: true
+      access-points:
+        "Bbox-4B44CDD8-Plus":
+          auth:
+            key-management: "sae"
+            password: "2Kheg71c7271WnQrVg"
+          networkmanager:
+            uuid: "4ad0fb6b-053f-4031-939a-40b5866e26e5"
+            name: "Bbox-4B44CDD8-Plus"
+            passthrough:
+              ipv6.addr-gen-mode: "default"
+              ipv6.ip6-privacy: "-1"
+              proxy._: ""
+      networkmanager:
+        uuid: "4ad0fb6b-053f-4031-939a-40b5866e26e5"
+        name: "Bbox-4B44CDD8-Plus"

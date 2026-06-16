@@ -1,0 +1,13 @@
+network:
+  version: 2
+  ethernets:
+    enp1s0:
+      renderer: NetworkManager
+      dhcp4: false
+      addresses:
+        - 192.168.1.52/24
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        addresses: [192.168.1.1]
