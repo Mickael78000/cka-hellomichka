@@ -1,0 +1,300 @@
+apiVersion: v1
+data:
+  index.html: "<!DOCTYPE html>\n<html lang=\"fr\" data-theme=\"dark\">\n<head>\n  <meta
+    charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n
+    \ <title>lab.michka.dev — homelab cluster</title>\n  <link rel=\"preconnect\"
+    href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\"
+    crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap\"
+    rel=\"stylesheet\">\n  <style>\n    /* ─── TOKENS ───────────────────────────────────────────────
+    */\n    :root {\n      --color-bg:          #0a0c0f;\n      --color-surface:     #0f1215;\n
+    \     --color-surface-2:   #141820;\n      --color-surface-3:   #1a1f2a;\n      --color-border:
+    \     rgba(255,255,255,0.07);\n      --color-border-2:    rgba(255,255,255,0.12);\n\n
+    \     --color-text:        #e2e4e9;\n      --color-text-muted:  #8892a4;\n      --color-text-faint:
+    \ #404857;\n\n      --color-primary:     #00d4c8;\n      --color-primary-dim:
+    rgba(0,212,200,0.12);\n      --color-primary-glow:rgba(0,212,200,0.25);\n\n      --color-green:
+    \      #4ade80;\n      --color-green-dim:   rgba(74,222,128,0.10);\n      --color-yellow:
+    \     #fbbf24;\n      --color-yellow-dim:  rgba(251,191,36,0.10);\n      --color-red:
+    \        #f87171;\n      --color-blue:        #60a5fa;\n      --color-purple:
+    \     #a78bfa;\n\n      --font-mono: 'JetBrains Mono', 'Courier New', monospace;\n
+    \     --font-body: 'Inter', sans-serif;\n\n      --text-xs:   clamp(0.7rem,  0.65rem
+    + 0.2vw, 0.8rem);\n      --text-sm:   clamp(0.8rem,  0.75rem + 0.25vw, 0.9rem);\n
+    \     --text-base: clamp(0.9rem,  0.85rem + 0.25vw, 1rem);\n      --text-lg:   clamp(1rem,
+    \   0.9rem  + 0.5vw,  1.25rem);\n      --text-xl:   clamp(1.25rem, 1rem    + 1vw,
+    \   1.75rem);\n      --text-2xl:  clamp(1.75rem, 1.2rem  + 2vw,    2.75rem);\n\n
+    \     --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;\n      --space-4:
+    1rem;    --space-6: 1.5rem;  --space-8: 2rem;\n      --space-10: 2.5rem; --space-12:
+    3rem;   --space-16: 4rem;\n\n      --radius-sm: 4px; --radius-md: 8px; --radius-lg:
+    12px;\n      --transition: 180ms cubic-bezier(0.16,1,0.3,1);\n    }\n\n    /*
+    ─── RESET ──────────────────────────────────────────────── */\n    *, *::before,
+    *::after { box-sizing: border-box; margin: 0; padding: 0; }\n    html { scroll-behavior:
+    smooth; -webkit-font-smoothing: antialiased; }\n    body {\n      font-family:
+    var(--font-body);\n      font-size: var(--text-base);\n      color: var(--color-text);\n
+    \     background: var(--color-bg);\n      min-height: 100dvh;\n      overflow-x:
+    hidden;\n    }\n    img { display: block; max-width: 100%; }\n    a { color: inherit;
+    text-decoration: none; }\n\n    /* ─── GRID BG ───────────────────────────────────────────────
+    */\n    body::before {\n      content: '';\n      position: fixed; inset: 0; z-index:
+    0; pointer-events: none;\n      background-image:\n        linear-gradient(rgba(0,212,200,0.03)
+    1px, transparent 1px),\n        linear-gradient(90deg, rgba(0,212,200,0.03) 1px,
+    transparent 1px);\n      background-size: 48px 48px;\n    }\n    body::after {\n
+    \     content: '';\n      position: fixed; inset: 0; z-index: 0; pointer-events:
+    none;\n      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,212,200,0.06)
+    0%, transparent 70%);\n    }\n\n    /* ─── LAYOUT ───────────────────────────────────────────────
+    */\n    .wrapper {\n      position: relative; z-index: 1;\n      max-width: 1100px;\n
+    \     margin-inline: auto;\n      padding-inline: var(--space-6);\n    }\n\n    /*
+    ─── HEADER ─────────────────────────────────────────────── */\n    header {\n
+    \     padding-block: var(--space-6);\n      border-bottom: 1px solid var(--color-border);\n
+    \     display: flex;\n      align-items: center;\n      justify-content: space-between;\n
+    \     gap: var(--space-4);\n    }\n    .logo {\n      display: flex; align-items:
+    center; gap: var(--space-3);\n      font-family: var(--font-mono);\n      font-size:
+    var(--text-sm);\n      font-weight: 600;\n      color: var(--color-text);\n    }\n
+    \   .logo svg { color: var(--color-primary); flex-shrink: 0; }\n    .logo-domain
+    { color: var(--color-text-muted); font-weight: 400; }\n    .logo-dot { color:
+    var(--color-primary); }\n\n    nav {\n      display: flex; align-items: center;
+    gap: var(--space-6);\n      font-family: var(--font-mono); font-size: var(--text-xs);\n
+    \   }\n    nav a {\n      color: var(--color-text-muted);\n      transition: color
+    var(--transition);\n    }\n    nav a:hover { color: var(--color-primary); }\n
+    \   .nav-status {\n      display: flex; align-items: center; gap: var(--space-2);\n
+    \     padding: var(--space-1) var(--space-3);\n      border: 1px solid rgba(74,222,128,0.25);\n
+    \     border-radius: var(--radius-sm);\n      background: var(--color-green-dim);\n
+    \     font-size: var(--text-xs);\n      color: var(--color-green);\n    }\n    .dot-pulse
+    {\n      width: 6px; height: 6px;\n      border-radius: 50%;\n      background:
+    var(--color-green);\n      animation: pulse 2s ease-in-out infinite;\n    }\n
+    \   @keyframes pulse {\n      0%,100% { opacity: 1; transform: scale(1); }\n      50%
+    \     { opacity: 0.5; transform: scale(0.8); }\n    }\n\n    /* ─── HERO ─────────────────────────────────────────────────
+    */\n    .hero {\n      padding-block: var(--space-16) var(--space-12);\n    }\n
+    \   .hero-eyebrow {\n      font-family: var(--font-mono);\n      font-size: var(--text-xs);\n
+    \     color: var(--color-primary);\n      letter-spacing: 0.12em;\n      text-transform:
+    uppercase;\n      margin-bottom: var(--space-4);\n      display: flex; align-items:
+    center; gap: var(--space-2);\n    }\n    .hero-eyebrow::before {\n      content:
+    '';\n      width: 20px; height: 1px;\n      background: var(--color-primary);\n
+    \   }\n    .hero h1 {\n      font-family: var(--font-mono);\n      font-size:
+    var(--text-2xl);\n      font-weight: 700;\n      line-height: 1.1;\n      margin-bottom:
+    var(--space-6);\n      color: var(--color-text);\n    }\n    .hero h1 span { color:
+    var(--color-primary); }\n    .hero-desc {\n      font-size: var(--text-base);\n
+    \     color: var(--color-text-muted);\n      max-width: 60ch;\n      line-height:
+    1.7;\n      margin-bottom: var(--space-8);\n    }\n    .hero-actions {\n      display:
+    flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;\n    }\n    .btn
+    {\n      display: inline-flex; align-items: center; gap: var(--space-2);\n      font-family:
+    var(--font-mono); font-size: var(--text-xs);\n      padding: var(--space-2) var(--space-4);\n
+    \     border-radius: var(--radius-sm);\n      border: 1px solid transparent;\n
+    \     cursor: pointer;\n      transition: all var(--transition);\n      white-space:
+    nowrap;\n    }\n    .btn-primary {\n      background: var(--color-primary);\n
+    \     color: var(--color-bg);\n      font-weight: 600;\n    }\n    .btn-primary:hover
+    {\n      background: #00bdb2;\n      box-shadow: 0 0 24px var(--color-primary-glow);\n
+    \   }\n    .btn-ghost {\n      background: transparent;\n      color: var(--color-text-muted);\n
+    \     border-color: var(--color-border-2);\n    }\n    .btn-ghost:hover {\n      color:
+    var(--color-text);\n      border-color: rgba(255,255,255,0.2);\n      background:
+    rgba(255,255,255,0.04);\n    }\n\n    /* ─── TERMINAL BLOCK ───────────────────────────────────────
+    */\n    .terminal {\n      background: var(--color-surface);\n      border: 1px
+    solid var(--color-border);\n      border-radius: var(--radius-lg);\n      overflow:
+    hidden;\n      margin-bottom: var(--space-12);\n      font-family: var(--font-mono);\n
+    \     font-size: var(--text-xs);\n    }\n    .terminal-bar {\n      background:
+    var(--color-surface-2);\n      border-bottom: 1px solid var(--color-border);\n
+    \     padding: var(--space-2) var(--space-4);\n      display: flex; align-items:
+    center; gap: var(--space-2);\n    }\n    .term-dot { width: 10px; height: 10px;
+    border-radius: 50%; }\n    .term-dot-r { background: #ff5f57; }\n    .term-dot-y
+    { background: #febc2e; }\n    .term-dot-g { background: #28c840; }\n    .terminal-title
+    {\n      margin-left: var(--space-2);\n      color: var(--color-text-faint);\n
+    \     font-size: var(--text-xs);\n    }\n    .terminal-body {\n      padding:
+    var(--space-4) var(--space-6);\n      line-height: 1.8;\n      color: var(--color-text-muted);\n
+    \   }\n    .terminal-body .prompt { color: var(--color-primary); }\n    .terminal-body
+    .cmd    { color: var(--color-text); }\n    .terminal-body .ok     { color: var(--color-green);
+    }\n    .terminal-body .warn   { color: var(--color-yellow); }\n    .terminal-body
+    .addr   { color: var(--color-blue); }\n    .terminal-body .name   { color: var(--color-purple);
+    }\n    .terminal-body .faint  { color: var(--color-text-faint); }\n    .terminal-body
+    .comment{ color: #3d4f6b; }\n\n    /* ─── SECTION ──────────────────────────────────────────────
+    */\n    section { padding-block: var(--space-12); border-top: 1px solid var(--color-border);
+    }\n    .section-label {\n      font-family: var(--font-mono);\n      font-size:
+    var(--text-xs);\n      color: var(--color-primary);\n      letter-spacing: 0.12em;\n
+    \     text-transform: uppercase;\n      margin-bottom: var(--space-8);\n      display:
+    flex; align-items: center; gap: var(--space-3);\n    }\n    .section-label::after
+    {\n      content: '';\n      flex: 1; height: 1px;\n      background: var(--color-border);\n
+    \   }\n\n    /* ─── GRID CARDS ─────────────────────────────────────────── */\n
+    \   .grid-3 {\n      display: grid;\n      grid-template-columns: repeat(auto-fill,
+    minmax(min(300px,100%), 1fr));\n      gap: var(--space-4);\n    }\n    .grid-2
+    {\n      display: grid;\n      grid-template-columns: repeat(auto-fill, minmax(min(440px,100%),
+    1fr));\n      gap: var(--space-4);\n    }\n    .card {\n      background: var(--color-surface);\n
+    \     border: 1px solid var(--color-border);\n      border-radius: var(--radius-lg);\n
+    \     padding: var(--space-6);\n      transition: border-color var(--transition),
+    box-shadow var(--transition);\n    }\n    .card:hover {\n      border-color: rgba(0,212,200,0.2);\n
+    \     box-shadow: 0 0 32px rgba(0,212,200,0.05);\n    }\n    .card-header {\n
+    \     display: flex; align-items: center;\n      justify-content: space-between;\n
+    \     margin-bottom: var(--space-4);\n    }\n    .card-title {\n      font-family:
+    var(--font-mono);\n      font-size: var(--text-sm);\n      font-weight: 600;\n
+    \     color: var(--color-text);\n    }\n    .card-body {\n      font-size: var(--text-sm);\n
+    \     color: var(--color-text-muted);\n      line-height: 1.7;\n    }\n    .badge
+    {\n      display: inline-flex; align-items: center; gap: 4px;\n      padding:
+    2px 8px;\n      border-radius: var(--radius-sm);\n      font-family: var(--font-mono);
+    font-size: var(--text-xs);\n      font-weight: 500;\n    }\n    .badge-green  {
+    background: var(--color-green-dim);  color: var(--color-green);  border: 1px solid
+    rgba(74,222,128,0.2);  }\n    .badge-yellow { background: var(--color-yellow-dim);
+    color: var(--color-yellow); border: 1px solid rgba(251,191,36,0.2); }\n    .badge-blue
+    \  { background: rgba(96,165,250,0.1);    color: var(--color-blue);   border:
+    1px solid rgba(96,165,250,0.2); }\n    .badge-teal   { background: var(--color-primary-dim);color:
+    var(--color-primary);border: 1px solid rgba(0,212,200,0.2); }\n\n    /* ─── NODE
+    CARDS ─────────────────────────────────────────── */\n    .node-role {\n      font-family:
+    var(--font-mono); font-size: var(--text-xs);\n      color: var(--color-text-faint);\n
+    \     text-transform: uppercase; letter-spacing: 0.1em;\n      margin-bottom:
+    var(--space-2);\n    }\n    .node-hostname {\n      font-family: var(--font-mono);
+    font-size: var(--text-lg);\n      font-weight: 700; color: var(--color-text);\n
+    \     margin-bottom: var(--space-1);\n    }\n    .node-ip {\n      font-family:
+    var(--font-mono); font-size: var(--text-xs);\n      color: var(--color-blue);\n
+    \     margin-bottom: var(--space-4);\n    }\n    .node-specs {\n      display:
+    flex; flex-direction: column; gap: var(--space-2);\n      margin-bottom: var(--space-4);\n
+    \   }\n    .spec-row {\n      display: flex; justify-content: space-between; align-items:
+    center;\n      font-size: var(--text-xs);\n      padding-bottom: var(--space-2);\n
+    \     border-bottom: 1px solid var(--color-border);\n    }\n    .spec-row:last-child
+    { border-bottom: none; }\n    .spec-key { color: var(--color-text-faint); font-family:
+    var(--font-mono); }\n    .spec-val { color: var(--color-text); font-family: var(--font-mono);
+    }\n\n    /* ─── STACK TABLE ────────────────────────────────────────── */\n    .stack-table
+    { width: 100%; border-collapse: collapse; }\n    .stack-table th {\n      font-family:
+    var(--font-mono); font-size: var(--text-xs);\n      color: var(--color-text-faint);
+    text-transform: uppercase; letter-spacing: 0.1em;\n      text-align: left; padding:
+    var(--space-2) var(--space-3);\n      border-bottom: 1px solid var(--color-border);\n
+    \   }\n    .stack-table td {\n      font-family: var(--font-mono); font-size:
+    var(--text-xs);\n      padding: var(--space-3);\n      border-bottom: 1px solid
+    var(--color-border);\n      color: var(--color-text-muted);\n      vertical-align:
+    middle;\n    }\n    .stack-table tr:last-child td { border-bottom: none; }\n    .stack-table
+    tr:hover td { background: rgba(255,255,255,0.02); }\n    .stack-name { color:
+    var(--color-text); font-weight: 500; }\n\n    /* ─── ARCH DIAGRAM ─────────────────────────────────────────
+    */\n    .arch {\n      background: var(--color-surface);\n      border: 1px solid
+    var(--color-border);\n      border-radius: var(--radius-lg);\n      padding: var(--space-8);\n
+    \     font-family: var(--font-mono); font-size: var(--text-xs);\n      color:
+    var(--color-text-muted);\n      line-height: 2;\n      overflow-x: auto;\n    }\n
+    \   .arch-flow { display: flex; align-items: center; gap: var(--space-3); flex-wrap:
+    wrap; }\n    .arch-box {\n      background: var(--color-surface-2);\n      border:
+    1px solid var(--color-border-2);\n      border-radius: var(--radius-sm);\n      padding:
+    var(--space-2) var(--space-4);\n      white-space: nowrap;\n    }\n    .arch-box.hl
+    { border-color: rgba(0,212,200,0.3); color: var(--color-primary); }\n    .arch-box.hl-g
+    { border-color: rgba(74,222,128,0.3); color: var(--color-green); }\n    .arch-arrow
+    { color: var(--color-text-faint); }\n    .arch-note {\n      margin-top: var(--space-4);\n
+    \     padding: var(--space-3) var(--space-4);\n      background: var(--color-primary-dim);\n
+    \     border-left: 2px solid var(--color-primary);\n      border-radius: 0 var(--radius-sm)
+    var(--radius-sm) 0;\n      color: var(--color-text-muted);\n      font-size: var(--text-xs);\n
+    \   }\n    .arch-note strong { color: var(--color-primary); }\n\n    /* ─── FOOTER
+    ─────────────────────────────────────────────── */\n    footer {\n      border-top:
+    1px solid var(--color-border);\n      padding-block: var(--space-8);\n      display:
+    flex; align-items: center;\n      justify-content: space-between; flex-wrap: wrap;\n
+    \     gap: var(--space-4);\n    }\n    .footer-left {\n      font-family: var(--font-mono);
+    font-size: var(--text-xs);\n      color: var(--color-text-faint);\n    }\n    .footer-left
+    a { color: var(--color-primary); }\n    .footer-left a:hover { text-decoration:
+    underline; }\n    .footer-links {\n      display: flex; gap: var(--space-6);\n
+    \     font-family: var(--font-mono); font-size: var(--text-xs);\n    }\n    .footer-links
+    a { color: var(--color-text-faint); transition: color var(--transition); }\n    .footer-links
+    a:hover { color: var(--color-primary); }\n\n    /* ─── SCROLL REVEALS ───────────────────────────────────────
+    */\n    .fade-in { opacity: 1; }\n    @supports (animation-timeline: scroll())
+    {\n      .fade-in {\n        opacity: 0;\n        animation: reveal-fade linear
+    both;\n        animation-timeline: view();\n        animation-range: entry 0%
+    entry 90%;\n      }\n      @keyframes reveal-fade { to { opacity: 1; } }\n    }\n\n
+    \   /* ─── RESPONSIVE ─────────────────────────────────────────── */\n    @media
+    (max-width: 640px) {\n      header { flex-direction: column; align-items: flex-start;
+    }\n      nav { gap: var(--space-4); }\n      .hero h1 { font-size: var(--text-xl);
+    }\n      .arch-flow { flex-direction: column; align-items: flex-start; }\n    }\n
+    \ </style>\n</head>\n<body>\n\n<!-- ─── HEADER ───────────────────────────────────────
+    -->\n<div class=\"wrapper\">\n  <header>\n    <div class=\"logo\">\n      <svg
+    width=\"22\" height=\"22\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\"
+    stroke-width=\"1.5\" aria-hidden=\"true\">\n        <rect x=\"2\" y=\"3\" width=\"20\"
+    height=\"5\" rx=\"1\"/>\n        <rect x=\"2\" y=\"10\" width=\"20\" height=\"5\"
+    rx=\"1\"/>\n        <rect x=\"2\" y=\"17\" width=\"20\" height=\"5\" rx=\"1\"/>\n
+    \       <circle cx=\"19\" cy=\"5.5\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/>\n
+    \       <circle cx=\"19\" cy=\"12.5\" r=\"1\" fill=\"currentColor\" stroke=\"none\"/>\n
+    \     </svg>\n      <span>lab<span class=\"logo-dot\">.</span><span class=\"logo-domain\">michka.dev</span></span>\n
+    \   </div>\n    <nav>\n      <a href=\"#cluster\">cluster</a>\n      <a href=\"#stack\">stack</a>\n
+    \     <a href=\"#arch\">architecture</a>\n      <div class=\"nav-status\">\n        <div
+    class=\"dot-pulse\"></div>\n        online\n      </div>\n    </nav>\n  </header>\n</div>\n\n<!--
+    ─── HERO ───────────────────────────────────────── -->\n<div class=\"wrapper\">\n
+    \ <div class=\"hero\">\n    <div class=\"hero-eyebrow\">homelab // cka-hellomichka</div>\n
+    \   <h1>Infrastructure<br><span>as code.</span><br>On bare metal.</h1>\n    <p
+    class=\"hero-desc\">\n      Cluster Kubernetes kubeadm auto-hébergé, exposé sur
+    Internet via Cloudflare Tunnel.\n      Réseau Calico VXLAN, mesh Tailscale, zéro
+    dépendance cloud pour le plan de contrôle.\n    </p>\n    <div class=\"hero-actions\">\n
+    \     <a href=\"https://www.chains-of-vertu.xyz/\" target=\"_blank\" rel=\"noopener
+    noreferrer\" class=\"btn btn-primary\">\n        <svg width=\"14\" height=\"14\"
+    viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"
+    aria-hidden=\"true\"><path d=\"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72
+    1.71\"/><path d=\"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71\"/></svg>\n
+    \       chains-of-vertu.xyz\n      </a>\n      <a href=\"https://github.com/Mickael78000\"
+    target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn btn-ghost\">\n        <svg
+    width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path
+    d=\"M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483
+    0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608
+    1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951
+    0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564
+    9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546
+    1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566
+    4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02
+    10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z\"/></svg>\n        GitHub\n      </a>\n
+    \   </div>\n  </div>\n\n  <!-- Terminal block -->\n  <div class=\"terminal fade-in\">\n
+    \   <div class=\"terminal-bar\">\n      <div class=\"term-dot term-dot-r\"></div>\n
+    \     <div class=\"term-dot term-dot-y\"></div>\n      <div class=\"term-dot term-dot-g\"></div>\n
+    \     <span class=\"terminal-title\">root@hellomichka-A8 ~ kubectl get nodes -o
+    wide</span>\n    </div>\n    <div class=\"terminal-body\">\n      <div><span class=\"faint\">NAME
+    \                  STATUS   ROLES           AGE   VERSION   INTERNAL-IP</span></div>\n
+    \     <div><span class=\"name\">hellomichka-a8</span>         <span class=\"ok\">Ready</span>
+    \   <span class=\"warn\">control-plane</span>   14d   <span class=\"addr\">v1.34.8</span>
+    \  <span class=\"addr\">192.168.1.52</span></div>\n      <div><span class=\"name\">cka-worker-01</span>
+    \         <span class=\"ok\">Ready</span>    <span class=\"faint\">&lt;none&gt;</span>
+    \         14d   <span class=\"addr\">v1.34.8</span>   <span class=\"addr\">192.168.1.12</span></div>\n
+    \     <br>\n      <div><span class=\"prompt\">$</span> <span class=\"cmd\">kubectl
+    get pods -n ingress-lab</span></div>\n      <div><span class=\"faint\">NAME                     READY
+    \  STATUS    RESTARTS   AGE</span></div>\n      <div><span class=\"name\">web-7d9f8b6c4-xk2m9</span>
+    \   <span class=\"ok\">1/1</span>     <span class=\"ok\">Running</span>   0          6h</div>\n
+    \     <br>\n      <div><span class=\"prompt\">$</span> <span class=\"cmd\">curl
+    -sI [https://lab.michka.dev/](https://lab.michka.dev/) | grep -E \"HTTP|server\"</span></div>\n
+    \     <div><span class=\"ok\">HTTP/2 200</span></div>\n      <div><span class=\"faint\">server:
+    cloudflare</span>   <span class=\"comment\"># ✓ tunnel actif</span></div>\n    </div>\n
+    \ </div>\n</div>\n\n<!-- ─── CLUSTER ─────────────────────────────────────── -->\n<div
+    class=\"wrapper\" id=\"cluster\">\n  <section>\n    <div class=\"section-label\">//
+    cluster nodes</div>\n    <div class=\"grid-2 fade-in\">\n\n      \n      <div
+    class=\"card\">\n        <div class=\"node-role\">node</div>\n        <div class=\"node-hostname\">cka-worker-01</div>\n
+    \       <div class=\"node-ip\">192.168.1.12</div>\n        <div class=\"node-specs\">\n
+    \         <div class=\"spec-row\"><span class=\"spec-key\">Status</span><span
+    class=\"spec-val\">Ready</span></div>\n          <div class=\"spec-row\"><span
+    class=\"spec-key\">Roles</span><span class=\"spec-val\">worker</span></div>\n
+    \         <div class=\"spec-row\"><span class=\"spec-key\">Age</span><span class=\"spec-val\">18d</span></div>\n
+    \         <div class=\"spec-row\"><span class=\"spec-key\">K8s</span><span class=\"spec-val\">v1.34.8</span></div>\n
+    \       </div>\n      </div>\n\n      <div class=\"card\">\n        <div class=\"node-role\">node</div>\n
+    \       <div class=\"node-hostname\">hellomichka-a8</div>\n        <div class=\"node-ip\">192.168.1.52</div>\n
+    \       <div class=\"node-specs\">\n          <div class=\"spec-row\"><span class=\"spec-key\">Status</span><span
+    class=\"spec-val\">Ready</span></div>\n          <div class=\"spec-row\"><span
+    class=\"spec-key\">Roles</span><span class=\"spec-val\">control-plane</span></div>\n
+    \         <div class=\"spec-row\"><span class=\"spec-key\">Age</span><span class=\"spec-val\">19d</span></div>\n
+    \         <div class=\"spec-row\"><span class=\"spec-key\">K8s</span><span class=\"spec-val\">v1.34.8</span></div>\n
+    \       </div>\n      </div>\n\n      </div>\n\n    </div>\n  </section>\n</div>\n\n<!--
+    ─── STACK ───────────────────────────────────────── -->\n<div class=\"wrapper\"
+    id=\"stack\">\n  <section>\n    <div class=\"section-label\">// stack technique</div>\n
+    \   <div class=\"card fade-in\">\n      <table class=\"stack-table\">\n        <thead>\n
+    \         <tr>\n            <th>composant</th>\n            <th>technologie</th>\n
+    \           <th>version</th>\n            <th>statut</th>\n          </tr>\n        </thead>\n
+    \       <tbody>\n<tr><td class=\"stack-name\">nginx-app-db9d89d49-p5qwv</td><td>1/1</td><td>Running</td><td>0</td><td>98s</td></tr>\n<tr><td
+    class=\"stack-name\">nginx-app-db9d89d49-stfwb</td><td>1/1</td><td>Running</td><td>0</td><td>112s</td></tr>\n<tr><td
+    class=\"stack-name\">nginx-app-db9d89d49-wh66r</td><td>1/1</td><td>Running</td><td>0</td><td>105s</td></tr>\n<tr><td
+    class=\"stack-name\">web-cfdccdb69-j4wnl</td><td>1/1</td><td>Running</td><td>1
+    (2d8h ago)</td><td>18d</td></tr>\n</tbody>\n      </table>\n    </div>\n  </section>\n</div>\n\n<!--
+    ─── ARCHITECTURE ────────────────────────────────── -->\n<div class=\"wrapper\"
+    id=\"arch\">\n  <section>\n    <div class=\"section-label\">// flux réseau</div>\n
+    \   <div class=\"arch fade-in\">\n      <div class=\"arch-flow\">\n        <div
+    class=\"arch-box hl\">Internet</div>\n        <div class=\"arch-arrow\">→</div>\n
+    \       <div class=\"arch-box hl\">Cloudflare anycast<br><small style=\"color:var(--color-text-faint)\">TLS
+    · WAF · QUIC</small></div>\n        <div class=\"arch-arrow\">→</div>\n        <div
+    class=\"arch-box\">cloudflared<br><small style=\"color:var(--color-text-faint)\">ml-hellomichka
+    · 192.168.1.11</small></div>\n        <div class=\"arch-arrow\">→</div>\n        <div
+    class=\"arch-box\">kube-proxy NodePort<br><small style=\"color:var(--color-text-faint)\">hellomichka-a8
+    · 192.168.1.52:30080</small></div>\n        <div class=\"arch-arrow\">→</div>\n
+    \       <div class=\"arch-box hl-g\">pod nginx<br><small style=\"color:var(--color-text-faint)\">ingress-lab
+    · cka-worker-01</small></div>\n      </div>\n      <div class=\"arch-note\">\n
+    \       <strong>Note :</strong> le trafic transite actuellement par le control-plane
+    (<code>192.168.1.52</code>) en raison d'un problème de bridge <code>br0</code>
+    sur l'hyperviseur. La cible finale est <code>192.168.1.12:30080</code> (worker
+    direct). Dérogation documentée, workaround temporaire.\n      </div>\n    </div>\n
+    \ </section>\n</div>\n\n<!-- ─── FOOTER ───────────────────────────────────────
+    -->\n<div class=\"wrapper\">\n  <footer>\n    <div class=\"footer-left\">\n      ©
+    2026 <a href=\"https://www.chains-of-vertu.xyz/\" target=\"_blank\" rel=\"noopener
+    noreferrer\">Mickaël Girondeau</a>\n      · lab.michka.dev · cluster cka-hellomichka\n
+    \   </div>\n    <div class=\"footer-links\">\n      <a href=\"https://www.chains-of-vertu.xyz/\"
+    target=\"_blank\" rel=\"noopener noreferrer\">portfolio</a>\n      <a href=\"https://github.com/Mickael78000\"
+    target=\"_blank\" rel=\"noopener noreferrer\">github</a>\n    </div>\n  </footer>\n</div>\n\n</body>\n</html>\n"
+kind: ConfigMap
+metadata:
+  name: nginx-app-html
+  namespace: ingress-lab

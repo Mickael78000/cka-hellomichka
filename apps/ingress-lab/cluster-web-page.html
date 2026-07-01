@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>lab.michka.dev — homelab cluster</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────────── */
+    :root {
+      --color-bg:          #0a0c0f;
+      --color-surface:     #0f1215;
+      --color-surface-2:   #141820;
+      --color-surface-3:   #1a1f2a;
+      --color-border:      rgba(255,255,255,0.07);
+      --color-border-2:    rgba(255,255,255,0.12);
+
+      --color-text:        #e2e4e9;
+      --color-text-muted:  #8892a4;
+      --color-text-faint:  #404857;
+
+      --color-primary:     #00d4c8;
+      --color-primary-dim: rgba(0,212,200,0.12);
+      --color-primary-glow:rgba(0,212,200,0.25);
+
+      --color-green:       #4ade80;
+      --color-green-dim:   rgba(74,222,128,0.10);
+      --color-yellow:      #fbbf24;
+      --color-yellow-dim:  rgba(251,191,36,0.10);
+      --color-red:         #f87171;
+      --color-blue:        #60a5fa;
+      --color-purple:      #a78bfa;
+
+      --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+      --font-body: 'Inter', sans-serif;
+
+      --text-xs:   clamp(0.7rem,  0.65rem + 0.2vw, 0.8rem);
+      --text-sm:   clamp(0.8rem,  0.75rem + 0.25vw, 0.9rem);
+      --text-base: clamp(0.9rem,  0.85rem + 0.25vw, 1rem);
+      --text-lg:   clamp(1rem,    0.9rem  + 0.5vw,  1.25rem);
+      --text-xl:   clamp(1.25rem, 1rem    + 1vw,    1.75rem);
+      --text-2xl:  clamp(1.75rem, 1.2rem  + 2vw,    2.75rem);
+
+      --space-1: 0.25rem; --space-2: 0.5rem;  --space-3: 0.75rem;
+      --space-4: 1rem;    --space-6: 1.5rem;  --space-8: 2rem;
+      --space-10: 2.5rem; --space-12: 3rem;   --space-16: 4rem;
+
+      --radius-sm: 4px; --radius-md: 8px; --radius-lg: 12px;
+      --transition: 180ms cubic-bezier(0.16,1,0.3,1);
+    }
+
+    /* ─── RESET ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--color-text);
+      background: var(--color-bg);
+      min-height: 100dvh;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── GRID BG ─────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(0,212,200,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,200,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,212,200,0.06) 0%, transparent 70%);
+    }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────── */
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin-inline: auto;
+      padding-inline: var(--space-6);
+    }
+
+    /* ─── HEADER ─────────────────────────────────────────────── */
+    header {
+      padding-block: var(--space-6);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+    }
+    .logo {
+      display: flex; align-items: center; gap: var(--space-3);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .logo svg { color: var(--color-primary); flex-shrink: 0; }
+    .logo-domain { color: var(--color-text-muted); font-weight: 400; }
+    .logo-dot { color: var(--color-primary); }
+
+    nav {
+      display: flex; align-items: center; gap: var(--space-6);
+      font-family: var(--font-mono); font-size: var(--text-xs);
+    }
+    nav a {
+      color: var(--color-text-muted);
+      transition: color var(--transition);
+    }
+    nav a:hover { color: var(--color-primary); }
+    .nav-status {
+      display: flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      border: 1px solid rgba(74,222,128,0.25);
+      border-radius: var(--radius-sm);
+      background: var(--color-green-dim);
+      font-size: var(--text-xs);
+      color: var(--color-green);
+    }
+    .dot-pulse {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--color-green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ─── HERO ───────────────────────────────────────────────── */
+    .hero {
+      padding-block: var(--space-16) var(--space-12);
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-primary);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 20px; height: 1px;
+      background: var(--color-primary);
+    }
+    .hero h1 {
+      font-family: var(--font-mono);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: var(--space-6);
+      color: var(--color-text);
+    }
+    .hero h1 span { color: var(--color-primary); }
+    .hero-desc {
+      font-size: var(--text-base);
+      color: var(--color-text-muted);
+      max-width: 60ch;
+      line-height: 1.7;
+      margin-bottom: var(--space-8);
+    }
+    .hero-actions {
+      display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--color-primary);
+      color: var(--color-bg);
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      background: #00bdb2;
+      box-shadow: 0 0 24px var(--color-primary-glow);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--color-text-muted);
+      border-color: var(--color-border-2);
+    }
+    .btn-ghost:hover {
+      color: var(--color-text);
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.04);
+    }
+
+    /* ─── TERMINAL BLOCK ─────────────────────────────────────── */
+    .terminal {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-12);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+    .terminal-bar {
+      background: var(--color-surface-2);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-4);
+      display: flex; align-items: center; gap: var(--space-2);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot-r { background: #ff5f57; }
+    .term-dot-y { background: #febc2e; }
+    .term-dot-g { background: #28c840; }
+    .terminal-title {
+      margin-left: var(--space-2);
+      color: var(--color-text-faint);
+      font-size: var(--text-xs);
+    }
+    .terminal-body {
+      padding: var(--space-4) var(--space-6);
+      line-height: 1.8;
+      color: var(--color-text-muted);
+    }
+    .terminal-body .prompt { color: var(--color-primary); }
+    .terminal-body .cmd    { color: var(--color-text); }
+    .terminal-body .ok     { color: var(--color-green); }
+    .terminal-body .warn   { color: var(--color-yellow); }
+    .terminal-body .addr   { color: var(--color-blue); }
+    .terminal-body .name   { color: var(--color-purple); }
+    .terminal-body .faint  { color: var(--color-text-faint); }
+    .terminal-body .comment{ color: #3d4f6b; }
+
+    /* ─── SECTION ────────────────────────────────────────────── */
+    section { padding-block: var(--space-12); border-top: 1px solid var(--color-border); }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--color-primary);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: var(--space-8);
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    .section-label::after {
+      content: '';
+      flex: 1; height: 1px;
+      background: var(--color-border);
+    }
+
+    /* ─── GRID CARDS ─────────────────────────────────────────── */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(300px,100%), 1fr));
+      gap: var(--space-4);
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(440px,100%), 1fr));
+      gap: var(--space-4);
+    }
+    .card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .card:hover {
+      border-color: rgba(0,212,200,0.2);
+      box-shadow: 0 0 32px rgba(0,212,200,0.05);
+    }
+    .card-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text);
+    }
+    .card-body {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      line-height: 1.7;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      font-weight: 500;
+    }
+    .badge-green  { background: var(--color-green-dim);  color: var(--color-green);  border: 1px solid rgba(74,222,128,0.2);  }
+    .badge-yellow { background: var(--color-yellow-dim); color: var(--color-yellow); border: 1px solid rgba(251,191,36,0.2); }
+    .badge-blue   { background: rgba(96,165,250,0.1);    color: var(--color-blue);   border: 1px solid rgba(96,165,250,0.2); }
+    .badge-teal   { background: var(--color-primary-dim);color: var(--color-primary);border: 1px solid rgba(0,212,200,0.2); }
+
+    /* ─── NODE CARDS ─────────────────────────────────────────── */
+    .node-role {
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--color-text-faint);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: var(--space-2);
+    }
+    .node-hostname {
+      font-family: var(--font-mono); font-size: var(--text-lg);
+      font-weight: 700; color: var(--color-text);
+      margin-bottom: var(--space-1);
+    }
+    .node-ip {
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--color-blue);
+      margin-bottom: var(--space-4);
+    }
+    .node-specs {
+      display: flex; flex-direction: column; gap: var(--space-2);
+      margin-bottom: var(--space-4);
+    }
+    .spec-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: var(--text-xs);
+      padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-key { color: var(--color-text-faint); font-family: var(--font-mono); }
+    .spec-val { color: var(--color-text); font-family: var(--font-mono); }
+
+    /* ─── STACK TABLE ────────────────────────────────────────── */
+    .stack-table { width: 100%; border-collapse: collapse; }
+    .stack-table th {
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--color-text-faint); text-transform: uppercase; letter-spacing: 0.1em;
+      text-align: left; padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .stack-table td {
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      padding: var(--space-3);
+      border-bottom: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      vertical-align: middle;
+    }
+    .stack-table tr:last-child td { border-bottom: none; }
+    .stack-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .stack-name { color: var(--color-text); font-weight: 500; }
+
+    /* ─── ARCH DIAGRAM ───────────────────────────────────────── */
+    .arch {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-8);
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      line-height: 2;
+      overflow-x: auto;
+    }
+    .arch-flow { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+    .arch-box {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border-2);
+      border-radius: var(--radius-sm);
+      padding: var(--space-2) var(--space-4);
+      white-space: nowrap;
+    }
+    .arch-box.hl { border-color: rgba(0,212,200,0.3); color: var(--color-primary); }
+    .arch-box.hl-g { border-color: rgba(74,222,128,0.3); color: var(--color-green); }
+    .arch-arrow { color: var(--color-text-faint); }
+    .arch-note {
+      margin-top: var(--space-4);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-primary-dim);
+      border-left: 2px solid var(--color-primary);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+    }
+    .arch-note strong { color: var(--color-primary); }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--color-border);
+      padding-block: var(--space-8);
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+    .footer-left {
+      font-family: var(--font-mono); font-size: var(--text-xs);
+      color: var(--color-text-faint);
+    }
+    .footer-left a { color: var(--color-primary); }
+    .footer-left a:hover { text-decoration: underline; }
+    .footer-links {
+      display: flex; gap: var(--space-6);
+      font-family: var(--font-mono); font-size: var(--text-xs);
+    }
+    .footer-links a { color: var(--color-text-faint); transition: color var(--transition); }
+    .footer-links a:hover { color: var(--color-primary); }
+
+    /* ─── SCROLL REVEALS ─────────────────────────────────────── */
+    .fade-in { opacity: 1; }
+    @supports (animation-timeline: scroll()) {
+      .fade-in {
+        opacity: 0;
+        animation: reveal-fade linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 90%;
+      }
+      @keyframes reveal-fade { to { opacity: 1; } }
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      header { flex-direction: column; align-items: flex-start; }
+      nav { gap: var(--space-4); }
+      .hero h1 { font-size: var(--text-xl); }
+      .arch-flow { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────── -->
+<div class="wrapper">
+  <header>
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <rect x="2" y="3" width="20" height="5" rx="1"/>
+        <rect x="2" y="10" width="20" height="5" rx="1"/>
+        <rect x="2" y="17" width="20" height="5" rx="1"/>
+        <circle cx="19" cy="5.5" r="1" fill="currentColor" stroke="none"/>
+        <circle cx="19" cy="12.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+      <span>lab<span class="logo-dot">.</span><span class="logo-domain">michka.dev</span></span>
+    </div>
+    <nav>
+      <a href="#cluster">cluster</a>
+      <a href="#stack">stack</a>
+      <a href="#arch">architecture</a>
+      <div class="nav-status">
+        <div class="dot-pulse"></div>
+        online
+      </div>
+    </nav>
+  </header>
+</div>
+
+<!-- ─── HERO ───────────────────────────────────────── -->
+<div class="wrapper">
+  <div class="hero">
+    <div class="hero-eyebrow">homelab // cka-hellomichka</div>
+    <h1>Infrastructure<br><span>as code.</span><br>On bare metal.</h1>
+    <p class="hero-desc">
+      Cluster Kubernetes kubeadm auto-hébergé, exposé sur Internet via Cloudflare Tunnel.
+      Réseau Calico VXLAN, mesh Tailscale, zéro dépendance cloud pour le plan de contrôle.
+    </p>
+    <div class="hero-actions">
+      <a href="https://www.chains-of-vertu.xyz/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        chains-of-vertu.xyz
+      </a>
+      <a href="https://github.com/Mickael78000" target="_blank" rel="noopener noreferrer" class="btn btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.942.359.31.678.921.678 1.856 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+
+  <!-- Terminal block -->
+  <div class="terminal fade-in">
+    <div class="terminal-bar">
+      <div class="term-dot term-dot-r"></div>
+      <div class="term-dot term-dot-y"></div>
+      <div class="term-dot term-dot-g"></div>
+      <span class="terminal-title">root@hellomichka-A8 ~ kubectl get nodes -o wide</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="faint">NAME                   STATUS   ROLES           AGE   VERSION   INTERNAL-IP</span></div>
+      <div><span class="name">hellomichka-a8</span>         <span class="ok">Ready</span>    <span class="warn">control-plane</span>   14d   <span class="addr">v1.34.8</span>   <span class="addr">192.168.1.52</span></div>
+      <div><span class="name">cka-worker-01</span>          <span class="ok">Ready</span>    <span class="faint">&lt;none&gt;</span>          14d   <span class="addr">v1.34.8</span>   <span class="addr">192.168.1.12</span></div>
+      <br>
+      <div><span class="prompt">$</span> <span class="cmd">kubectl get pods -n ingress-lab</span></div>
+      <div><span class="faint">NAME                     READY   STATUS    RESTARTS   AGE</span></div>
+      <div><span class="name">web-7d9f8b6c4-xk2m9</span>    <span class="ok">1/1</span>     <span class="ok">Running</span>   0          6h</div>
+      <br>
+      <div><span class="prompt">$</span> <span class="cmd">curl -sI [https://lab.michka.dev/](https://lab.michka.dev/) | grep -E "HTTP|server"</span></div>
+      <div><span class="ok">HTTP/2 200</span></div>
+      <div><span class="faint">server: cloudflare</span>   <span class="comment"># ✓ tunnel actif</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CLUSTER ─────────────────────────────────────── -->
+<div class="wrapper" id="cluster">
+  <section>
+    <div class="section-label">// cluster nodes</div>
+    <div class="grid-2 fade-in">
+
+      <!-- Node 1 -->
+      <div class="card">
+        <div class="node-role">control-plane</div>
+        <div class="node-hostname">hellomichka-a8</div>
+        <div class="node-ip">192.168.1.52</div>
+        <div class="node-specs">
+          <div class="spec-row"><span class="spec-key">OS</span><span class="spec-val">Ubuntu 24.04 LTS</span></div>
+          <div class="spec-row"><span class="spec-key">Kubernetes</span><span class="spec-val">v1.34.8</span></div>
+          <div class="spec-row"><span class="spec-key">Role</span><span class="spec-val">API Server · etcd · scheduler</span></div>
+          <div class="spec-row"><span class="spec-key">Tailscale</span><span class="spec-val">100.121.186.6</span></div>
+        </div>
+        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+          <span class="badge badge-green">● Ready</span>
+          <span class="badge badge-blue">kubeadm</span>
+          <span class="badge badge-teal">Tailscale</span>
+        </div>
+      </div>
+
+      <!-- Node 2 -->
+      <div class="card">
+        <div class="node-role">worker · vm kvm</div>
+        <div class="node-hostname">cka-worker-01</div>
+        <div class="node-ip">192.168.1.12</div>
+        <div class="node-specs">
+          <div class="spec-row"><span class="spec-key">Hyperviseur</span><span class="spec-val">ml-hellomichka (192.168.1.11)</span></div>
+          <div class="spec-row"><span class="spec-key">Kubernetes</span><span class="spec-val">v1.34.8</span></div>
+          <div class="spec-row"><span class="spec-key">Role</span><span class="spec-val">workloads · pods · services</span></div>
+          <div class="spec-row"><span class="spec-key">NodePort</span><span class="spec-val">30000 – 32767</span></div>
+        </div>
+        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;">
+          <span class="badge badge-green">● Ready</span>
+          <span class="badge badge-yellow">VM KVM</span>
+          <span class="badge badge-blue">kube-proxy</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<!-- ─── STACK ───────────────────────────────────────── -->
+<div class="wrapper" id="stack">
+  <section>
+    <div class="section-label">// stack technique</div>
+    <div class="card fade-in">
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th>composant</th>
+            <th>technologie</th>
+            <th>version</th>
+            <th>statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="stack-name">Orchestration</td>
+            <td>Kubernetes (kubeadm)</td>
+            <td>v1.34.8</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">CNI / réseau pods</td>
+            <td>Calico VXLAN</td>
+            <td>v3.29</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">Virtualisation</td>
+            <td>KVM / libvirt</td>
+            <td>—</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">Tunnel Internet</td>
+            <td>Cloudflare Tunnel (cloudflared)</td>
+            <td>2026.6.0</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">Mesh VPN</td>
+            <td>Tailscale</td>
+            <td>—</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">Exposition</td>
+            <td>NodePort 30080</td>
+            <td>—</td>
+            <td><span class="badge badge-yellow">workaround</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">Ingress controller</td>
+            <td>ingress-nginx</td>
+            <td>—</td>
+            <td><span class="badge badge-yellow">à déployer</span></td>
+          </tr>
+          <tr>
+            <td class="stack-name">OS</td>
+            <td>Ubuntu 24.04 LTS</td>
+            <td>Noble</td>
+            <td><span class="badge badge-green">actif</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ─── ARCHITECTURE ────────────────────────────────── -->
+<div class="wrapper" id="arch">
+  <section>
+    <div class="section-label">// flux réseau</div>
+    <div class="arch fade-in">
+      <div class="arch-flow">
+        <div class="arch-box hl">Internet</div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box hl">Cloudflare anycast<br><small style="color:var(--color-text-faint)">TLS · WAF · QUIC</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">cloudflared<br><small style="color:var(--color-text-faint)">ml-hellomichka · 192.168.1.11</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">kube-proxy NodePort<br><small style="color:var(--color-text-faint)">hellomichka-a8 · 192.168.1.52:30080</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box hl-g">pod nginx<br><small style="color:var(--color-text-faint)">ingress-lab · cka-worker-01</small></div>
+      </div>
+      <div class="arch-note">
+        <strong>Note :</strong> le trafic transite actuellement par le control-plane (<code>192.168.1.52</code>) en raison d'un problème de bridge <code>br0</code> sur l'hyperviseur. La cible finale est <code>192.168.1.12:30080</code> (worker direct). Dérogation documentée, workaround temporaire.
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ─── FOOTER ─────────────────────────────────────── -->
+<div class="wrapper">
+  <footer>
+    <div class="footer-left">
+      © 2026 <a href="https://www.chains-of-vertu.xyz/" target="_blank" rel="noopener noreferrer">Mickaël Girondeau</a>
+      · lab.michka.dev · cluster cka-hellomichka
+    </div>
+    <div class="footer-links">
+      <a href="https://www.chains-of-vertu.xyz/" target="_blank" rel="noopener noreferrer">portfolio</a>
+      <a href="https://github.com/Mickael78000" target="_blank" rel="noopener noreferrer">github</a>
+    </div>
+  </footer>
+</div>
+
+</body>
+</html>

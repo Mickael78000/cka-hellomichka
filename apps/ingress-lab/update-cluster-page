@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+NS="ingress-lab"
+CM_NAME="nginx-app-html"
+DEPLOY="nginx-app"
+
+SRC_HTML="cluster-web-page.html"
+GEN_HTML="cluster-web-page.generated.html"
+CM_YAML="nginx-app-html-configmap.yaml"
+
+command -v kubectl >/dev/null 2>&1 || { echo "kubectl not found" >&2; exit 1; }
+command -v python3 >/dev/null 2>&1 || { echo "python3 not found" >&2; exit 1; }
+
+python3 - <<'PY'
+import subprocess, re
+from pathlib import Path
+from html import escape
+
+src = Path("cluster-web-page.html")
+out = Path("cluster-web-page.generated.html")
+
+nodes = subprocess.check_output(["kubectl","get","nodes","-o","wide"], text=True)
+pods = subprocess.check_output(["kubectl","get","pods","-n","ingress-lab"], text=True)
+
+nl = [l for l in nodes.splitlines() if l.strip()]
+pl = [l for l in pods.splitlines() if l.strip()]
+
+nrows = []
+for line in nl[1:]:
+    cols = re.split(r"\s{2,}", line.strip())
+    if len(cols) >= 6:
+        nrows.append(tuple(cols[:6]))
+
+prows = []
+for line in pl[1:]:
+    cols = re.split(r"\s{2,}", line.strip())
+    if len(cols) >= 5:
+        prows.append(tuple(cols[:5]))
+
+node_cards = []
+for n, status, roles, age, version, ip in nrows:
+    node_cards.append(f'''
+      <div class="card">
+        <div class="node-role">node</div>
+        <div class="node-hostname">{escape(n)}</div>
+        <div class="node-ip">{escape(ip)}</div>
+        <div class="node-specs">
+          <div class="spec-row"><span class="spec-key">Status</span><span class="spec-val">{escape(status)}</span></div>
+          <div class="spec-row"><span class="spec-key">Roles</span><span class="spec-val">{escape(roles)}</span></div>
+          <div class="spec-row"><span class="spec-key">Age</span><span class="spec-val">{escape(age)}</span></div>
+          <div class="spec-row"><span class="spec-key">K8s</span><span class="spec-val">{escape(version)}</span></div>
+        </div>
+      </div>
+'''.rstrip())
+
+pod_rows = []
+for name, ready, status, restarts, age in prows:
+    pod_rows.append(
+        f'<tr><td class="stack-name">{escape(name)}</td><td>{escape(ready)}</td><td>{escape(status)}</td><td>{escape(restarts)}</td><td>{escape(age)}</td></tr>'
+    )
+
+html = src.read_text(encoding="utf-8")
+
+start = html.find('<!-- Node 1 -->')
+mid = html.find('<!-- Node 2 -->')
+end = html.find('<!-- ─── STACK ───────────────────────────────────────── -->')
+
+if start != -1 and mid != -1 and end != -1:
+    cluster_section = (
+        html[:start]
+        + '\n'.join(node_cards)
+        + '\n\n      </div>\n\n    </div>\n  </section>\n</div>\n\n'
+        + html[end:]
+    )
+else:
+    cluster_section = html
+
+tbody_start = cluster_section.find("<tbody>")
+tbody_end = cluster_section.find("</tbody>")
+
+if tbody_start != -1 and tbody_end != -1:
+    tbody_start += len("<tbody>")
+    cluster_section = (
+        cluster_section[:tbody_start]
+        + "\n"
+        + "\n".join(pod_rows)
+        + "\n"
+        + cluster_section[tbody_end:]
+    )
+
+out.write_text(cluster_section, encoding="utf-8")
+print(out)
+PY
+
+kubectl -n "$NS" create configmap "$CM_NAME" \
+  --from-file=index.html="$GEN_HTML" \
+  --dry-run=client -o yaml > "$CM_YAML"
+
+kubectl apply -f "$CM_YAML"
+kubectl rollout restart deployment/"$DEPLOY" -n "$NS"
+kubectl rollout status deployment/"$DEPLOY" -n "$NS"
